@@ -1,0 +1,174 @@
+<!--GUI for Breast Cancer Detection Application using SVM-->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <title>Breast Cancer Detection</title>
+  <style>
+    /*just bg and body style*/
+    body {
+      margin: 40px;
+      background-color: #808080;
+      background-image: linear-gradient(315deg, #de5499 19%, #a0c5ba 85%);
+    }
+
+    .container {
+      border-radius: 5px;
+      text-align: center;
+    }
+
+    .btn-container {
+      background: white;
+      box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+      border-radius: 5px;
+      padding: 10px;
+    }
+
+    .head {
+      font-weight: bolder;
+    }
+
+    .btn-primary {
+      border-color: #ff33f !important;
+      color: #ffffff;
+      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+      background-color: #de5499 !important;
+      border-color: #de5499 !important;
+      padding: 5px;
+    }
+
+    label {
+      width: 50%;
+    }
+
+    #predict {
+      display: none;
+    }
+
+    .form-group {
+      padding: 2px;
+    }
+    .cell{
+      margin-left: 10px;
+      padding:2px;
+      width: 100px;
+      margin-bottom: 2px;
+    }
+  </style>
+  <!--Font Awesome-->
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1 class="head">Breast Cancer Detection</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="btn-container">
+
+          <!-- Main Input For Receiving Query to our ML -->
+          <form action="{{ url_for('predict')}}" method="post" class="form-inline">
+            
+            <div class="row">
+              <div class="col-md-6">
+                <img class="image" src="{{url_for('static', filename='img.jpeg')}}" width="100%" height="100%" />
+              </div>
+              <div class="col-md-6">
+                <div class="container">
+                  <h4 style="text-align: center;">Enter Cell Details</h4>
+                  <table>
+                    <tr>
+                      <td></td>
+                      <th>Mean</th>
+                      <th>Standard D</th>
+                      <th>worst</th>
+                  </tr>
+                    <tr>
+                      <th>Radius</th>
+                      <td><input type="text" class="cell" name="radiusM" required="required" value="13.54"></td>
+                      <td><input type="text" class="cell" name="radiusS" required="required" value="0.2699"></td>
+                      <td><input type="text" class="cell" name="radiusW" required="required" value="15.11"></td>
+                    </tr>
+                    <tr>
+                      <th>texture</th>
+                      <td><input type="text" class="cell" name="textureM" required="required" value="14.36"></td>
+                      <td><input type="text" class="cell" name="textureS" required="required"value="0.7886"></td>
+                      <td><input type="text" class="cell" name="textureW" required="required"value="19.26"></td>
+                    </tr>
+                    <tr>
+                      <th>perimeter</th>
+                      <td><input type="text" class="cell" name="perimeterM" required="required"value="87.46"></td>
+                      <td><input type="text" class="cell" name="perimeterS" required="required" value="2.058"></td>
+                      <td><input type="text" class="cell" name="perimeterW" required="required"value="99.7"></td>
+                    </tr>
+                    <tr>
+                      <th>area</th>
+                      <td><input type="text" class="cell" name="areaM" required="required" value="566.3"></td>
+                      <td><input type="text" class="cell" name="areaS" required="required"value="23.56"></td>
+                      <td><input type="text" class="cell" name="areaW" required="required"value="711.2"></td>
+                    </tr>
+                    <tr>
+                      <th>smoothness</th>
+                      <td><input type="text" class="cell" name="smoothnessM" required="required" value="0.09779"></td>
+                      <td><input type="text" class="cell" name="smoothnessS" required="required"value="0.008462"></td>
+                      <td><input type="text" class="cell" name="smoothnessW" required="required"value="0.144"></td>
+                    </tr>
+                    <tr>
+                      <th>compactness</th>
+                      <td><input type="text" class="cell" name="compactnessM" required="required" value="0.08129"></td>
+                      <td><input type="text" class="cell" name="compactnessS" required="required"value="0.0146"></td>
+                      <td><input type="text" class="cell" name="compactnessW" required="required"value="0.1773"></td>
+                    </tr>
+                    <tr>
+                      <th>concavity</th>
+                      <td><input type="text" class="cell" name="concavityM" required="required" value="0.06664"></td>
+                      <td><input type="text" class="cell" name="concavityS" required="required"value="0.02387"></td>
+                      <td><input type="text" class="cell" name="concavityW" required="required"value="0.239"></td>
+                    </tr>
+                    <tr>
+                      <th>concave points</th>
+                      <td><input type="text" class="cell" name="concave pointsM" required="required"value="0.04781"></td>
+                      <td><input type="text" class="cell" name="concave pointsS" required="required"value="0.01315"></td>
+                      <td><input type="text" class="cell" name="concave pointsW" required="required"value="0.1288"></td>
+                    </tr>
+                    <tr>
+                      <th>symmetry</th>
+                      <td><input type="text" class="cell" name="symmetryM" required="required"value="0.1885"></td>
+                      <td><input type="text" class="cell" name="symmetryS" required="required"value="0.0198"></td>
+                      <td><input type="text" class="cell" name="symmetryW" required="required"value="0.2977"></td>
+                    </tr>
+                    <tr>
+                      <th>fractal_dimension</th>
+                      <td><input type="text" class="cell" name="fractal_dimensionM" required="required"value="0.05766"></td>
+                      <td><input type="text" class="cell" name="fractal_dimensionS" required="required"value="0.0023"></td>
+                      <td><input type="text" class="cell" name="fractal_dimensionW" required="required"value="0.07259"></td>
+                    </tr>
+                  </table>
+                  
+                  <button style="margin-top: 3%;" type="submit" class="btn btn-primary btn-lg">Predict Cancer</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        <br />
+        <center>
+          <h1 style="background:#de5499">{{prediction_text}}</h1>
+        </center>
+        <br />
+</body>
+
+</html>
